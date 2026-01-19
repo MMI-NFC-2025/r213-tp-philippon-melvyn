@@ -1,7 +1,16 @@
 ---
 import Layout from "../layouts/Layout.astro";
+console.log ('Hello from frontmatter');
+const name = "frontmatter"
 ---
 
 <Layout titre="Accueil">
-	<h1>Accueil</h1>
+	<h1>Home page</h1>
+	<div> hello <span id="nameLocation"	data-name(name)></span></div>
+	<button id="addName">Add name</button>
 </Layout>
+
+<script>
+	console.log('Hello from script');
+	const buttonAdd = document.getElementById("addname")
+</script>
