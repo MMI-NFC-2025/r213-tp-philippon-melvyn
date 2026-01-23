@@ -1,27 +1,43 @@
-<div
-    class="offer-card bg-gray-50 border border-gray-300 rounded-md p-4
-         flex flex-col gap-3 cursor-pointer
-         hover:bg-gray-100 transition-colors w-80"
-    data-favori="true"
->
-    <img src="image1.png" class="w-full h-36 object-cover rounded-sm" />
+---
+const { offre } = Astro.props;
+---
 
-    <div class="flex justify-between items-center">
-        <h3 class="text-base font-semibold text-gray-800">
-            Beverly Springfield
+<div
+    class="offer-card bg-white border border-blue-200 rounded-lg p-5
+         shadow-sm hover:shadow-md hover:-translate-y-1
+         transition-all cursor-pointer w-80"
+    data-favori={offre.favori.toString()}
+>
+    <img
+        src={offre.imgUrl}
+        alt={offre.nomMaison}
+        class="w-full h-36 object-cover rounded-md mb-4"
+    />
+
+    <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold text-blue-900">
+            {offre.nomMaison}
         </h3>
 
-        <span class="text-gray-900 font-bold"> 2700 € </span>
+        <span class="text-blue-700 font-bold">
+            {offre.prix} €
+        </span>
     </div>
 
-    <p class="text-sm text-gray-600">2821 Lake Sevilla, Palm Harbor, TX</p>
+    <p class="text-sm text-blue-600 mb-2">
+        {offre.adresse}
+    </p>
 
-    <p class="text-sm text-gray-700">4 chambres · 2 salles de bain · 45 m²</p>
+    <p class="text-sm text-blue-800 mb-4">
+        {offre.nbChambres} chambres · {offre.nbSdb} salles de bain · {
+            offre.surface
+        } m²
+    </p>
 
     <button
-        class="favori-btn mt-2
-           border border-gray-400 px-3 py-1 rounded
-           text-sm hover:bg-gray-200 transition"
+        class="favori-btn bg-blue-600 hover:bg-blue-700
+           text-white px-4 py-2 rounded-md
+           text-sm transition-colors"
     >
         Favori
     </button>
