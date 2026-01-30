@@ -1,58 +1,34 @@
 ---
 const { offre } = Astro.props;
 console.log(offre.favori);
+import PbImage from "./PbImage.astro";
 ---
 
 <div
-    class="offer-card bg-white border border-blue-200 rounded-lg p-5
-         shadow-sm hover:shadow-md hover:-translate-y-1
-         transition-all cursor-pointer w-80"
+    class="offer-card w-80 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200
+         shadow-sm transition-all duration-200
+         hover:-translate-y-1 hover:shadow-lg hover:ring-slate-300
+         cursor-pointer"
     data-favori={offre.favori.toString()}
 >
-    <img
-        src={offre.imgUrl}
-        alt={offre.nomMaison}
-        class="w-full h-36 object-cover rounded-md mb-4"
-    />
-
-    <div class="flex justify-between items-center mb-2">
-        <h3 class="text-lg font-semibold text-blue-900">
-            {offre.nomMaison}
-        </h3>
-
-        <span class="text-blue-700 font-bold">
-            {offre.prix} €
-        </span>
+    <div class="h-48 w-full overflow-hidden bg-slate-100">
+        <PbImage
+            record={offre}
+            recordImage={offre.images[0]}
+            class="h-full w-full object-cover"
+        />
     </div>
 
-    <p class="text-sm text-blue-600 mb-2">
-        {offre.adresse}
-    </p>
+    <h3 class="p-4 text-base font-semibold text-slate-900 truncate">
+        {offre.nom_maison}
+    </h3>
 
-    <p class="text-sm text-blue-800 mb-4">
-        {offre.nbChambres} chambres · {offre.nbSdb} salles de bain · {
-            offre.surface
-        } m²
-    </p>
-
-    <button
-        class="favori-btn bg-blue-600 hover:bg-blue-700
-           text-white px-4 py-2 rounded-md
-           text-sm transition-colors"
-    >
-        Favori
-    </button>
-    <script>
-        //@ts-nocheck
-        const cards = document.querySelectorAll("OffreCard");
-        cards.forEach((card) => {
-            card.addEventListener("click", () => {
-                const isFavori = card.dataset.favori === "true";
-                card.dataset.favori = isFavori ? "false" : "true";
-                console.log(card.dataset.favori);
-                card.classList.toggle("bg-yellow-100");
-                card.classList.toggle("bg-white");
-            });
-        });
-    </script>
+    <style>
+        .offer-card :global(img) {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+    </style>
 </div>
