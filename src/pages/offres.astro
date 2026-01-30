@@ -7,52 +7,169 @@ const offres = await getOffres();
 ---
 
 <Layout titre="Offres">
-    <section class="max-w-6xl mx-auto px-6 py-8">
-        <h1 class="text-2xl font-bold mb-6">Offres</h1>
-
-        <div class="mb-8">
-            <button
-                id="favori-button"
-                class="bg-slate-600 rounded-lg text-white px-4 py-2"
+    <div class="min-h-screen bg-slate-50">
+        <!-- HERO -->
+        <header class="relative overflow-hidden">
+            <div
+                class="absolute inset-0 bg-linear-to-br from-blue-600 via-indigo-600 to-slate-900 opacity-90"
             >
-                Afficher les favoris
-            </button>
-        </div>
-        <div
-            class="grid gap-6
-             grid-cols-1
-             sm:grid-cols-2
-             lg:grid-cols-3"
-        >
-            {
-                offres.map((offre) => (
-                    <div class="offre" data-favori={offre.favori.toString()}>
-                        <OfferCard offre={offre} />
+            </div>
+            <div
+                class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_45%)]"
+            >
+            </div>
+
+            <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+                <div class="max-w-2xl">
+                    <p
+                        class="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-sm font-medium text-white ring-1 ring-white/25"
+                    >
+                        Agence immobilière • Sélection du moment
+                    </p>
+
+                    <h1
+                        class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-white"
+                    >
+                        Nos offres
+                    </h1>
+
+                    <p class="mt-4 text-white/85 text-base sm:text-lg">
+                        Parcourez nos biens disponibles et affichez uniquement
+                        vos favoris en un clic.
+                    </p>
+
+                    <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                        <button
+                            id="favori-button"
+                            class="inline-flex items-center justify-center rounded-xl px-5 py-3
+                     bg-white text-slate-900 font-semibold shadow-sm
+                     transition hover:bg-slate-100 active:scale-[0.99]
+                     focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                        >
+                            Afficher les favoris
+                        </button>
+
+                        <a
+                            href="#liste"
+                            class="inline-flex items-center justify-center rounded-xl px-5 py-3
+                     bg-transparent text-white font-semibold ring-1 ring-white/30
+                     transition hover:bg-white/10 active:scale-[0.99]"
+                        >
+                            Voir les offres
+                        </a>
                     </div>
-                ))
-            }
-        </div>
-    </section>
+                </div>
+
+                <!-- Mini stats -->
+                <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div
+                        class="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur"
+                    >
+                        <p class="text-sm text-white/75">Offres disponibles</p>
+                        <p class="mt-1 text-2xl font-bold text-white">
+                            {offres.length}
+                        </p>
+                    </div>
+                    <div
+                        class="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur"
+                    >
+                        <p class="text-sm text-white/75">Affichage</p>
+                        <p class="mt-1 text-2xl font-bold text-white">
+                            Catalogue
+                        </p>
+                    </div>
+                    <div
+                        class="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur"
+                    >
+                        <p class="text-sm text-white/75">Favoris</p>
+                        <p class="mt-1 text-2xl font-bold text-white">Filtre</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- LISTE -->
+        <main id="liste" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+            <!-- Barre d’actions -->
+            <div
+                class="mb-8 rounded-xl bg-white border border-slate-200 shadow-sm px-4 py-4"
+            >
+                <div
+                    class="flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+                >
+                    <div>
+                        <h2 class="text-lg font-semibold text-slate-900">
+                            Catalogue
+                        </h2>
+                        <p class="text-sm text-slate-600">
+                            Cliquez sur le bouton pour afficher uniquement les
+                            favoris.
+                        </p>
+                    </div>
+
+                    <button
+                        id="favori-button-duplicate"
+                        class="inline-flex items-center justify-center rounded-xl px-4 py-2.5
+                   bg-blue-600 text-white font-semibold shadow-sm
+                   transition hover:bg-blue-700 active:scale-[0.99]
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    >
+                        Afficher les favoris
+                    </button>
+                </div>
+            </div>
+
+            <!-- GRID : 3 par ligne sur desktop -->
+            <div class="grid gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {
+                    offres.map((offre) => (
+                        <div
+                            class="offre"
+                            data-favori={offre.favori.toString()}
+                        >
+                            <OfferCard offre={offre} />
+                        </div>
+                    ))
+                }
+            </div>
+        </main>
+    </div>
 
     <script>
         const button = document.getElementById("favori-button");
+        const button2 = document.getElementById("favori-button-duplicate");
         let showOnlyFavorites = false;
+
+        const updateButtons = () => {
+            const text = showOnlyFavorites
+                ? "Afficher tout"
+                : "Afficher les favoris";
+            if (button) button.textContent = text;
+            if (button2) button2.textContent = text;
+        };
+
+        const applyFilter = () => {
+            const offres = document.querySelectorAll(".offre");
+            offres.forEach((offre) => {
+                const offreElement = offre as HTMLElement;
+                const isFavori = offreElement.dataset.favori === "true";
+                if (showOnlyFavorites) {
+                    offreElement.style.display = isFavori ? "block" : "none";
+                } else {
+                    offreElement.style.display = "block";
+                }
+            });
+            updateButtons();
+        };
 
         button?.addEventListener("click", () => {
             showOnlyFavorites = !showOnlyFavorites;
-            const offres: NodeListOf<HTMLElement> = document.querySelectorAll(".offre");
+            applyFilter();
+        });
 
-            offres.forEach((offre) => {
-                const isFavori = offre.dataset.favori === "true";
-
-                if (showOnlyFavorites) {
-                    offre.style.display = isFavori ? "block" : "none";
-                    button.textContent = "Afficher tout";
-                } else {
-                    offre.style.display = "block";
-                    button.textContent = "Afficher les favoris";
-                }
-            });
+        button2?.addEventListener("click", () => {
+            showOnlyFavorites = !showOnlyFavorites;
+            applyFilter();
         });
     </script>
 </Layout>

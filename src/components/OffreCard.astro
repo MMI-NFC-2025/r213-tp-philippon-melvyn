@@ -1,34 +1,41 @@
 ---
 const { offre } = Astro.props;
+const { record, recordImage, width = 900, height = 400 } = Astro.props;
 console.log(offre.favori);
 import PbImage from "./PbImage.astro";
 ---
 
 <div
-    class="offer-card w-80 overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200
-         shadow-sm transition-all duration-200
-         hover:-translate-y-1 hover:shadow-lg hover:ring-slate-300
+    class="offer-card group h-full w-full overflow-hidden
+         rounded-xl bg-white
+         ring-1 ring-slate-200
+         shadow-sm transition-all duration-300
+         hover:shadow-xl hover:ring-slate-300
          cursor-pointer"
     data-favori={offre.favori.toString()}
 >
-    <div class="h-48 w-full overflow-hidden bg-slate-100">
+    <div class="relative overflow-hidden bg-slate-200">
         <PbImage
             record={offre}
             recordImage={offre.images[0]}
-            class="h-full w-full object-cover"
+            width={width}
+            height={height}
+            class="object-cover transition-transform duration-500 group-hover:scale-105"
         />
+
+        <div
+            class="pointer-events-none absolute inset-0
+             bg-linear-to-t from-black/50 via-black/10 to-transparent"
+        >
+        </div>
     </div>
 
-    <h3 class="p-4 text-base font-semibold text-slate-900 truncate">
-        {offre.nom_maison}
-    </h3>
-
-    <style>
-        .offer-card :global(img) {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-    </style>
+    <div class="flex h-20 items-center px-5">
+        <h3
+            class="text-lg font-semibold tracking-tight text-slate-900
+             group-hover:text-blue-700 transition-colors truncate"
+        >
+            {offre.nom_maison}
+        </h3>
+    </div>
 </div>
