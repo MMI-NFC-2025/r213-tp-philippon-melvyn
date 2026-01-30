@@ -1,5 +1,6 @@
 ---
 const { offre } = Astro.props;
+console.log(offre.favori);
 ---
 
 <div
@@ -41,4 +42,17 @@ const { offre } = Astro.props;
     >
         Favori
     </button>
+    <script>
+        //@ts-nocheck
+        const cards = document.querySelectorAll("OffreCard");
+        cards.forEach((card) => {
+            card.addEventListener("click", () => {
+                const isFavori = card.dataset.favori === "true";
+                card.dataset.favori = isFavori ? "false" : "true";
+                console.log(card.dataset.favori);
+                card.classList.toggle("bg-yellow-100");
+                card.classList.toggle("bg-white");
+            });
+        });
+    </script>
 </div>
