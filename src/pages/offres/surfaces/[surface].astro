@@ -1,0 +1,22 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { getOffresSup80 } from "../../../js/backend.mjs";
+
+const { surface } = Astro.params;
+const offres = await getOffresSup80(surface);
+---
+
+    <Layout titre={`Offres de ${offres[0]?.surface || surface} m²`}>
+    <h2>Offres de {surface} m² ou plus</h2>
+    <ul>
+        {
+            offres.map((offre) => (
+                <li key={offre.id}>
+                    <a href={`/offres/${offre.id}`}>
+                        {offre.nomMaison} - {offre.surface} m²
+                    </a>
+                </li>
+            ))
+        }
+    </ul>
+</Layout>

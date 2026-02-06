@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import OfferCard from "../../components/OffreCard.astro";
+import { getOffresSup80 } from "../../js/backend.mjs";
 
 import { getOffres } from "../../js/backend.mjs";
 const offres = await getOffres();
@@ -8,7 +9,6 @@ const offres = await getOffres();
 
 <Layout titre="Offres">
     <div class="min-h-screen bg-slate-50">
-        <!-- HERO -->
         <header class="relative overflow-hidden">
             <div
                 class="absolute inset-0 bg-linear-to-br from-blue-600 via-indigo-600 to-slate-900 opacity-90"
@@ -38,29 +38,19 @@ const offres = await getOffres();
                         vos favoris en un clic.
                     </p>
 
-                    <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                        <button
-                            id="favori-button"
-                            class="inline-flex items-center justify-center rounded-xl px-5 py-3
-                     bg-white text-slate-900 font-semibold shadow-sm
-                     transition hover:bg-slate-100 active:scale-[0.99]
-                     focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
-                        >
-                            Afficher les favoris
-                        </button>
-
+                    <button class="mt-6 flex flex-col sm:flex-row gap-3">
                         <a
-                            href="#liste"
+                            href="/offres/surfaces/80"
                             class="inline-flex items-center justify-center rounded-xl px-5 py-3
-                     bg-transparent text-white font-semibold ring-1 ring-white/30
-                     transition hover:bg-white/10 active:scale-[0.99]"
+                       bg-emerald-500 text-white font-semibold shadow-sm
+                       transition hover:bg-emerald-600 active:scale-[0.99]
+                       focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                         >
-                            Voir les offres
+                            Surfaces 
                         </a>
-                    </div>
+                    </button>
                 </div>
 
-                <!-- Mini stats -->
                 <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div
                         class="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur"
@@ -88,9 +78,7 @@ const offres = await getOffres();
             </div>
         </header>
 
-        <!-- LISTE -->
         <main id="liste" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-            <!-- Barre d’actions -->
             <div
                 class="mb-8 rounded-xl bg-white border border-slate-200 shadow-sm px-4 py-4"
             >
@@ -119,7 +107,6 @@ const offres = await getOffres();
                 </div>
             </div>
 
-            <!-- GRID : 3 par ligne sur desktop -->
             <div class="grid gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {
                     offres.map((offre) => (

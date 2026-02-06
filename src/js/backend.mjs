@@ -61,3 +61,13 @@ export async function getOffre(id) {
         return null;
     }
 }
+
+export async function getOffresSup80() {
+    try {
+        const records = await db.collection("maison").getFullList({ filter: `surface > 80` });
+        return records;
+    } catch (error) {
+        console.log('Une erreur est survenue en lisant les maisons avec surface > 80', error);
+        return null;
+    }
+}
