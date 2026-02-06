@@ -51,3 +51,13 @@ export async function allMaisonsAgent(id) {
     const record = await db.collection("agent").getOne(id);
     return record;
 }
+
+export async function getOffre(id) {
+    try {
+        const data = await db.collection('maison').getOne(id);
+        return data;
+    } catch (error) {
+        console.log('Une erreur est survenue en lisant la maison', error);
+        return null;
+    }
+}
