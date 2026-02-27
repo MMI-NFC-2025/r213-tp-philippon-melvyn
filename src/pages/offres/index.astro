@@ -1,29 +1,45 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import OfferCard from "../../components/OffreCard.astro";
-import { getOffresSup80 } from "../../js/backend.mjs";
-
 import { getOffres } from "../../js/backend.mjs";
-const offres = await getOffres();
+
+let offres = await getOffres();
 
 let message = "";
+
 if (Astro.request.method === "POST") {
     const data = await Astro.request.formData();
-    const minPrix = parseInt(data.get("minPrix"));
-    const maxPrix = parseInt(data.get("maxPrix"));
 
-    if (minPrix > 0 && maxPrix > 0 && maxPrix > minPrix) {
-        Offres = await filterByPrix(minPrix, maxPrix);
-        if (Offres.length === 0) {
-            message = `Pas d'offres entre ${minPrix}€ et ${maxPrix}€`;
-        } else {
-            message = `Liste des offres entre ${minPrix}€ et ${maxPrix}€`;
-        }
+    const minPrixRaw = data.get("minPrix")?.toString() ?? "";
+    const maxPrixRaw = data.get("maxPrix")?.toString() ?? "";
+
+    const minPrix = Number(minPrixRaw);
+    const maxPrix = Number(maxPrixRaw);
+
+    // ✅ validations supplémentaires (frontmatter)
+    const isMinValid = Number.isFinite(minPrix) && minPrix >= 0;
+    const isMaxValid = Number.isFinite(maxPrix) && maxPrix >= 0;
+
+    if (!isMinValid || !isMaxValid) {
+        message = "Veuillez entrer des nombres valides (>= 0).";
+    } else if (maxPrix <= minPrix) {
+        message =
+            "Le prix maximum doit être strictement supérieur au prix minimum.";
+    } else if (maxPrix > 10_000_000) {
+        message = "Le prix maximum est trop élevé.";
     } else {
-        message = "Veuillez entrer des valeurs valides pour le prix.";
+        // ✅ consigne TD : utiliser filter()
+        const allOffres = await getOffres();
+        offres = allOffres.filter((o) => {
+            const prix = Number(o.prix);
+            return Number.isFinite(prix) && prix >= minPrix && prix <= maxPrix;
+        });
+
+        message =
+            offres.length === 0
+                ? `Pas d'offres entre ${minPrix}€ et ${maxPrix}€`
+                : `Liste des offres entre ${minPrix}€ et ${maxPrix}€`;
     }
-} else {
-    Offres = await getOffres();
 }
 ---
 
@@ -62,9 +78,9 @@ if (Astro.request.method === "POST") {
                         <a
                             href="/offres/surfaces/80"
                             class="inline-flex items-center justify-center rounded-xl px-5 py-3
-                       bg-emerald-500 text-white font-semibold shadow-sm
-                       transition hover:bg-emerald-600 active:scale-[0.99]
-                       focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                            bg-emerald-500 text-white font-semibold shadow-sm
+                            transition hover:bg-emerald-600 active:scale-[0.99]
+                            focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                         >
                             Surfaces
                         </a>
@@ -98,11 +114,59 @@ if (Astro.request.method === "POST") {
             </div>
         </header>
 
-        <form action="/offres" method="POST">
-            <input type="number" name="minPrix" placeholder="Prix minimum" />
-            <input type="number" name="maxPrix" placeholder="Prix maximum" />
-            <input type="submit" value="Filtrer par prix" />
-        </form>
+        {/* ✅ Formulaire stylé + validations côté client */}
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8">
+            <form
+                action="/offres"
+                method="POST"
+                class="rounded-xl bg-white border border-slate-200 shadow-sm p-4 flex flex-col md:flex-row gap-3 items-start md:items-end"
+            >
+                <div class="flex-1">
+                    <label
+                        class="block text-sm font-medium text-slate-700 mb-1"
+                        for="minPrix">Prix minimum</label
+                    >
+                    <input
+                        id="minPrix"
+                        type="number"
+                        name="minPrix"
+                        placeholder="0"
+                        min="0"
+                        step="1"
+                        required
+                        class="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                <div class="flex-1">
+                    <label
+                        class="block text-sm font-medium text-slate-700 mb-1"
+                        for="maxPrix">Prix maximum</label
+                    >
+                    <input
+                        id="maxPrix"
+                        type="number"
+                        name="maxPrix"
+                        placeholder="1000000"
+                        min="0"
+                        step="1"
+                        required
+                        class="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                <input
+                    type="submit"
+                    value="Filtrer par prix"
+                    class="inline-flex items-center justify-center rounded-xl px-4 py-2.5
+                    bg-blue-600 text-white font-semibold shadow-sm
+                    transition hover:bg-blue-700 active:scale-[0.99]
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                />
+            </form>
+
+            {message && <p class="mt-3 text-sm text-slate-700">{message}</p>}
+        </div>
 
         <main id="liste" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
             <div
@@ -124,9 +188,10 @@ if (Astro.request.method === "POST") {
                     <button
                         id="favori-button-duplicate"
                         class="inline-flex items-center justify-center rounded-xl px-4 py-2.5
-                   bg-blue-600 text-white font-semibold shadow-sm
-                   transition hover:bg-blue-700 active:scale-[0.99]
-                   focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                        bg-blue-600 text-white font-semibold shadow-sm
+                        transition hover:bg-blue-700 active:scale-[0.99]
+                        focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                        type="button"
                     >
                         Afficher les favoris
                     </button>
@@ -149,36 +214,27 @@ if (Astro.request.method === "POST") {
     </div>
 
     <script>
-        const button = document.getElementById("favori-button");
         const button2 = document.getElementById("favori-button-duplicate");
         let showOnlyFavorites = false;
-
-        const updateButtons = () => {
-            const text = showOnlyFavorites
-                ? "Afficher tout"
-                : "Afficher les favoris";
-            if (button) button.textContent = text;
-            if (button2) button2.textContent = text;
-        };
 
         const applyFilter = () => {
             const offres = document.querySelectorAll(".offre");
             offres.forEach((offre) => {
-                const offreElement = offre as HTMLElement;
+                const offreElement = offre;
                 const isFavori = offreElement.dataset.favori === "true";
-                if (showOnlyFavorites) {
-                    offreElement.style.display = isFavori ? "block" : "none";
-                } else {
-                    offreElement.style.display = "block";
-                }
+                offreElement.style.display = showOnlyFavorites
+                    ? isFavori
+                        ? "block"
+                        : "none"
+                    : "block";
             });
-            updateButtons();
-        };
 
-        button?.addEventListener("click", () => {
-            showOnlyFavorites = !showOnlyFavorites;
-            applyFilter();
-        });
+            if (button2) {
+                button2.textContent = showOnlyFavorites
+                    ? "Afficher tout"
+                    : "Afficher les favoris";
+            }
+        };
 
         button2?.addEventListener("click", () => {
             showOnlyFavorites = !showOnlyFavorites;
