@@ -1,0 +1,170 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CardAgent from "../../components/CardAgent.astro";
+import { getAgents } from "../../js/backend.mjs";
+
+let agents = await getAgents();
+let message = "";
+
+if (Astro.request.method === "POST") {
+    const data = await Astro.request.formData();
+    const recherche =
+        data.get("recherche")?.toString().trim().toLowerCase() ?? "";
+
+    const allAgents = await getAgents();
+
+    if (recherche.length === 0) {
+        agents = allAgents;
+        message = "Liste complète des agents.";
+    } else {
+        agents = allAgents.filter((agent) => {
+            const nom = (agent.nom ?? "").toString().toLowerCase();
+            const prenom = (agent.prenom ?? "").toString().toLowerCase();
+            const email = (agent.email ?? "").toString().toLowerCase();
+
+            return (
+                nom.includes(recherche) ||
+                prenom.includes(recherche) ||
+                email.includes(recherche)
+            );
+        });
+
+        message =
+            agents.length === 0
+                ? `Aucun agent trouvé pour : ${recherche}`
+                : `${agents.length} agent(s) trouvé(s) pour : ${recherche}`;
+    }
+}
+---
+
+<Layout titre="Agents">
+    <div class="min-h-screen bg-slate-50">
+        <header class="relative overflow-hidden">
+            <div
+                class="absolute inset-0 bg-linear-to-br from-cyan-600 via-blue-600 to-slate-900 opacity-90"
+            >
+            </div>
+            <div
+                class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_45%)]"
+            >
+            </div>
+
+            <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+                <div class="max-w-2xl">
+                    <p
+                        class="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-sm font-medium text-white ring-1 ring-white/25"
+                    >
+                        Agence immobilière • Collection AGENT
+                    </p>
+
+                    <h1
+                        class="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight text-white"
+                    >
+                        Nos agents
+                    </h1>
+
+                    <p class="mt-4 text-white/85 text-base sm:text-lg">
+                        Consultez la liste des agents enregistrés et recherchez
+                        rapidement un profil par nom, prénom ou e-mail.
+                    </p>
+                </div>
+
+                <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div
+                        class="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur"
+                    >
+                        <p class="text-sm text-white/75">Agents enregistrés</p>
+                        <p class="mt-1 text-2xl font-bold text-white">
+                            {agents.length}
+                        </p>
+                    </div>
+
+                    <div
+                        class="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur"
+                    >
+                        <p class="text-sm text-white/75">Affichage</p>
+                        <p class="mt-1 text-2xl font-bold text-white">
+                            Catalogue
+                        </p>
+                    </div>
+
+                    <div
+                        class="rounded-xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur"
+                    >
+                        <p class="text-sm text-white/75">Recherche</p>
+                        <p class="mt-1 text-2xl font-bold text-white">Active</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8">
+            <form
+                action="/agents"
+                method="POST"
+                class="rounded-xl bg-white border border-slate-200 shadow-sm p-4 flex flex-col md:flex-row gap-3 items-start md:items-end"
+            >
+                <div class="flex-1">
+                    <label
+                        class="block text-sm font-medium text-slate-700 mb-1"
+                        for="recherche"
+                    >
+                        Rechercher un agent
+                    </label>
+                    <input
+                        id="recherche"
+                        type="text"
+                        name="recherche"
+                        placeholder="Nom, prénom ou e-mail"
+                        class="w-full p-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                <input
+                    type="submit"
+                    value="Rechercher"
+                    class="inline-flex items-center justify-center rounded-xl px-4 py-2.5
+                    bg-blue-600 text-white font-semibold shadow-sm
+                    transition hover:bg-blue-700 active:scale-[0.99]
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                />
+            </form>
+
+            {message && <p class="mt-3 text-sm text-slate-700">{message}</p>}
+        </div>
+
+        <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+            <div
+                class="mb-8 rounded-xl bg-white border border-slate-200 shadow-sm px-4 py-4"
+            >
+                <div
+                    class="flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+                >
+                    <div>
+                        <h2 class="text-lg font-semibold text-slate-900">
+                            Liste des agents
+                        </h2>
+                        <p class="text-sm text-slate-600">
+                            Cliquez sur le bouton pour voir la fiche complète
+                            d’un agent.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {
+                agents.length === 0 ? (
+                    <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-8 text-center text-slate-600">
+                        Aucun agent à afficher.
+                    </div>
+                ) : (
+                    <div class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                        {agents.map((agent) => (
+                            <CardAgent agent={agent} />
+                        ))}
+                    </div>
+                )
+            }
+        </main>
+    </div>
+</Layout>

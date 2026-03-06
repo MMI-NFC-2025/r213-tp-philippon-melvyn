@@ -1,43 +1,66 @@
 ---
-const { offre } = Astro.props;
-const { record, recordImage, width = 900, height = 400 } = Astro.props;
-console.log(offre.favori);
-import Surface from "../pages/offres/surfaces/[surface].astro";
+const { offre, width = 900, height = 500 } = Astro.props;
+
 import PbImage from "./PbImage.astro";
 ---
 
 <div
     class="offer-card group h-full w-full overflow-hidden
-         rounded-xl bg-white
-         ring-1 ring-slate-200
-         shadow-sm transition-all duration-300
-         hover:shadow-xl hover:ring-slate-300
-         cursor-pointer"
-    data-favori={offre.favori.toString()}
+    rounded-2xl bg-white
+    ring-1 ring-slate-200
+    shadow-sm transition-all duration-300
+    hover:shadow-xl hover:ring-slate-300"
+    data-favori={offre.favori?.toString()}
 >
-    <div class="relative overflow-hidden bg-slate-200">
+    <div class="relative h-56 overflow-hidden bg-slate-200">
         <PbImage
             record={offre}
-            recordImage={offre.images[0]}
             width={width}
             height={height}
-            class="object-cover transition-transform duration-500 group-hover:scale-105"
+            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
         <div
-            class="pointer-events-none absolute inset-0
-             bg-linear-to-t from-black/50 via-black/10 to-transparent"
+            class="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent"
         >
         </div>
+
+        {
+            offre.favori && (
+                <div class="absolute top-3 right-3 bg-emerald-500 text-white text-xs px-2 py-1 rounded-lg shadow">
+                    Favori
+                </div>
+            )
+        }
+
+        <div class="absolute bottom-3 left-4 right-4 text-white">
+            <h3 class="text-lg font-bold truncate">
+                {offre.nom_maison}
+            </h3>
+        </div>
+
+        <button class="favoriteButton absolute bottom-0 left-0 p-2 text-white rounded-br-lg" data-offre={JSON.stringify(offre)}>
+    <img id="favorite-icon" src={offre.favorite ? "favorite.png" : "favorite.png"} alt="Favorite Icon" class="w-6 h-6" />
+</button>
     </div>
 
-    <div class="flex h-20 items-center px-5">
-        <h3
-            class="text-lg font-semibold tracking-tight text-slate-900
-             group-hover:text-blue-700 transition-colors truncate"
-        >
-            {offre.nom_maison}
-        </h3>
+    <div class="p-5 space-y-3">
+        <div class="flex items-center justify-between text-sm text-slate-600">
+            <span>{offre.surface} m²</span>
+            <span>{offre.nombres_chambres} chambres</span>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <p class="text-lg font-bold text-slate-900">
+                {Number(offre.prix).toLocaleString("fr-FR")} €
+            </p>
+
+            <a
+                href={`/offres/${offre.id}`}
+                class="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1 text-sm font-semibold text-white transition hover:bg-blue-700"
+            >
+                Voir plus
+            </a>
+        </div>
     </div>
-    <a href={`/offres/${offre.id}`}>Voir plus</a>
 </div>

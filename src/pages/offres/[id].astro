@@ -4,11 +4,100 @@ import { getOffre } from "../../js/backend.mjs";
 
 const { id } = Astro.params;
 const offre = await getOffre(id);
+const agent = offre?.expand?.agent ?? null;
 ---
 
-<Layout titre={offre.nomMaison}>
-    <h2>{offre.nomMaison}</h2>
-    <ul>
-        <li>{offre.adresse}</li>
-    </ul>
+<Layout titre={offre ? offre.nomMaison : "Offre introuvable"}>
+    <div class="min-h-screen bg-slate-50 py-10">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+            <a
+                href="/offres"
+                class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
+            >
+                ← Retour à la liste des offres
+            </a>
+
+            {
+                !offre ? (
+                    <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+                        <h1 class="text-2xl font-bold text-slate-900">
+                            Offre introuvable
+                        </h1>
+                        <p class="mt-2 text-slate-600">
+                            Aucune maison ne correspond à cet identifiant.
+                        </p>
+                    </div>
+                ) : (
+                    <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+                        <p class="text-sm font-medium uppercase tracking-wide text-slate-500">
+                            Détail de l’offre
+                        </p>
+
+                        <h1 class="mt-2 text-3xl font-bold text-slate-900">
+                            {offre.nomMaison}
+                        </h1>
+
+                        <div class="mt-8 grid gap-4 sm:grid-cols-2">
+                            <div class="rounded-xl bg-slate-50 p-4">
+                                <p class="text-sm font-medium text-slate-500">
+                                    Adresse
+                                </p>
+                                <p class="mt-1 text-slate-900">
+                                    {offre.adresse}
+                                </p>
+                            </div>
+
+                            {offre.prix && (
+                                <div class="rounded-xl bg-slate-50 p-4">
+                                    <p class="text-sm font-medium text-slate-500">
+                                        Prix
+                                    </p>
+                                    <p class="mt-1 text-slate-900">
+                                        {offre.prix} €
+                                    </p>
+                                </div>
+                            )}
+
+                            {offre.surface && (
+                                <div class="rounded-xl bg-slate-50 p-4">
+                                    <p class="text-sm font-medium text-slate-500">
+                                        Surface
+                                    </p>
+                                    <p class="mt-1 text-slate-900">
+                                        {offre.surface} m²
+                                    </p>
+                                </div>
+                            )}
+
+                            <div class="rounded-xl bg-slate-50 p-4">
+                                <p class="text-sm font-medium text-slate-500">
+                                    Agent responsable
+                                </p>
+
+                                {agent ? (
+                                    <a
+                                        href={`/agents/${agent.id}`}
+                                        class="mt-1 inline-block text-blue-600 font-semibold hover:text-blue-700 hover:underline"
+                                    >
+                                        {agent.prenom} {agent.nom}
+                                    </a>
+                                ) : offre.agent ? (
+                                    <a
+                                        href={`/agents/${offre.agent}`}
+                                        class="mt-1 inline-block text-blue-600 font-semibold hover:text-blue-700 hover:underline"
+                                    >
+                                        Voir la fiche de l’agent
+                                    </a>
+                                ) : (
+                                    <p class="mt-1 text-slate-900">
+                                        Aucun agent lié
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+        </div>
+    </div>
 </Layout>

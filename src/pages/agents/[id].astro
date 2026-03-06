@@ -1,0 +1,219 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getAgent } from "../../js/backend.mjs";
+import OfferCard from "../../components/OffreCard.astro";
+
+const { id } = Astro.params;
+const agent = await getAgent(id);
+
+const offres = agent?.expand?.maison
+    ? Array.isArray(agent.expand.maison)
+        ? agent.expand.maison
+        : [agent.expand.maison]
+    : [];
+
+function formatDate(date) {
+    if (!date) return "Non disponible";
+
+    return new Date(date).toLocaleString("fr-FR", {
+        dateStyle: "full",
+        timeStyle: "short",
+    });
+}
+---
+
+<Layout titre={agent ? `${agent.prenom} ${agent.nom}` : "Agent introuvable"}>
+    <div class="min-h-screen bg-slate-50">
+        {
+            !agent ? (
+                <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
+                    <a
+                        href="/agents"
+                        class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
+                    >
+                        ← Retour à la liste des agents
+                    </a>
+
+                    <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+                        <h1 class="text-2xl font-bold text-slate-900">
+                            Agent introuvable
+                        </h1>
+                        <p class="mt-2 text-slate-600">
+                            Aucun agent ne correspond à cet identifiant.
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    <section class="relative overflow-hidden">
+                        <div class="absolute inset-0 bg-linear-to-br from-blue-700 via-indigo-700 to-slate-900" />
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_35%)]" />
+
+                        <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+                            <a
+                                href="/agents"
+                                class="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/15"
+                            >
+                                ← Retour à la liste des agents
+                            </a>
+
+                            <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+                                <div>
+                                    <p class="text-sm font-medium uppercase tracking-[0.2em] text-white/70">
+                                        Fiche agent
+                                    </p>
+
+                                    <h1 class="mt-3 text-4xl font-black tracking-tight text-white sm:text-5xl md:text-6xl">
+                                        {agent.prenom}
+                                        <span class="block text-white/90">
+                                            {agent.nom}
+                                        </span>
+                                    </h1>
+
+                                    <p class="mt-4 max-w-2xl text-base text-white/80 sm:text-lg">
+                                        Consultez les informations principales
+                                        de cet agent ainsi que toutes les
+                                        maisons liées via la relation
+                                        PocketBase.
+                                    </p>
+                                </div>
+
+                                <div class="w-full max-w-sm rounded-2xl bg-white/10 p-5 ring-1 ring-white/20 backdrop-blur">
+                                    <p class="text-sm text-white/70">
+                                        Contact principal
+                                    </p>
+                                    <p class="mt-2 text-lg font-semibold text-white break-all">
+                                        {agent.email}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
+                        <div class="grid gap-6 lg:grid-cols-3">
+                            <div class="lg:col-span-2">
+                                <div class="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div>
+                                            <p class="text-sm font-medium uppercase tracking-wide text-slate-500">
+                                                Informations importantes
+                                            </p>
+                                            <h2 class="mt-2 text-2xl font-bold text-slate-900">
+                                                Profil de l’agent
+                                            </h2>
+                                        </div>
+
+                                        <span class="inline-flex rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700">
+                                            Agent actif
+                                        </span>
+                                    </div>
+
+                                    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+                                        <div class="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
+                                            <p class="text-sm font-medium text-slate-500">
+                                                Prénom
+                                            </p>
+                                            <p class="mt-2 text-xl font-bold text-slate-900">
+                                                {agent.prenom}
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200">
+                                            <p class="text-sm font-medium text-slate-500">
+                                                Nom
+                                            </p>
+                                            <p class="mt-2 text-xl font-bold text-slate-900">
+                                                {agent.nom}
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-200 sm:col-span-2">
+                                            <p class="text-sm font-medium text-slate-500">
+                                                Adresse e-mail
+                                            </p>
+                                            <p class="mt-2 text-lg font-semibold text-slate-900 break-all">
+                                                {agent.email}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                                    <p class="text-sm font-medium uppercase tracking-wide text-slate-500">
+                                        Suivi
+                                    </p>
+
+                                    <div class="mt-5 space-y-4">
+                                        <div class="rounded-2xl bg-blue-50 p-4 ring-1 ring-blue-100">
+                                            <p class="text-sm font-medium text-blue-700">
+                                                Créé le
+                                            </p>
+                                            <p class="mt-2 text-sm font-semibold text-slate-900">
+                                                {formatDate(agent.created)}
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-2xl bg-indigo-50 p-4 ring-1 ring-indigo-100">
+                                            <p class="text-sm font-medium text-indigo-700">
+                                                Mis à jour le
+                                            </p>
+                                            <p class="mt-2 text-sm font-semibold text-slate-900">
+                                                {formatDate(agent.updated)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                                    <p class="text-sm font-medium uppercase tracking-wide text-slate-500">
+                                        Identifiant
+                                    </p>
+                                    <p class="mt-3 break-all text-sm text-slate-700">
+                                        {agent.id}
+                                    </p>
+                                </div>
+
+                                <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+                                    <p class="text-sm font-medium uppercase tracking-wide text-slate-500">
+                                        Nombre d’offres
+                                    </p>
+                                    <p class="mt-3 text-3xl font-black text-slate-900">
+                                        {offres.length}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-10 rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-sm font-medium uppercase tracking-wide text-slate-500">
+                                        Offres liées
+                                    </p>
+                                    <h2 class="mt-2 text-2xl font-bold text-slate-900">
+                                        Maisons de {agent.prenom} {agent.nom}
+                                    </h2>
+                                </div>
+                            </div>
+
+                            {offres.length === 0 ? (
+                                <p class="mt-6 text-slate-600">
+                                    Aucune offre n’est liée à cet agent.
+                                </p>
+                            ) : (
+                                <div class="mt-8 grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                                    {offres.map((offre) => (
+                                        <OfferCard offre={offre} />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                </>
+            )
+        }
+    </div>
+</Layout>
